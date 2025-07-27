@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DocSpy (Package)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "--light"
+    },
+    "DocSpy (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
