@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DocSpy
+namespace DocSpy.Source
 {
     public record TRoot(string WebFolder, string Name, string? BuildCommand, string? BuildCommandArguments, string? Editor, string? EditorArguments)
     {

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace DocSpy
+namespace DocSpy.Source
 {
     /// <summary>
     /// Class providing functionality around switching and restoring theme settings

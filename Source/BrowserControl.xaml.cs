@@ -1,3 +1,4 @@
+using DocSpy.Source;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -280,7 +281,7 @@ namespace DocSpy
     }
 
 
-    public class JSBackgroundConverter : IValueConverter
+    public partial class JSBackgroundConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

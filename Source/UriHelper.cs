@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace DocSpy
+namespace DocSpy.Source
 {
     internal class UriHelper
     {
