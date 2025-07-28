@@ -7,6 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <local:JSBackgroundConverter x:Key="JSBackgroundConverter"/>
+    </UserControl.Resources>
     <Grid x:Name="BrowserAndToolbar">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -21,6 +24,7 @@
                 <ColumnDefinition Width="92" />
                 <ColumnDefinition Width="92" />
                 <ColumnDefinition Width="92" />
+                <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="40" />
@@ -60,6 +64,7 @@
                         BorderBrush="Black"
                         BorderThickness="0.5"
                         Foreground="White"
+                        ToolTipService.ToolTip="Rebuild the current site using the associated doc generator."
                         HorizontalAlignment="Stretch"
                         Margin="4,0,4,0"
                         Click="RebuildButton_Clicked">
@@ -70,6 +75,7 @@
                         Grid.Column="5"
                         Style="{ThemeResource AccentButtonStyle}"
                         HorizontalAlignment="Stretch"
+                        ToolTipService.ToolTip="Edit the current page in the associated editor."
                         Margin="4,0,4,0"
                         Click="EditButton_Clicked">
             </Button>
@@ -78,6 +84,7 @@
                         x:Name="OpenButton"
                         Grid.Column="6"
                         Style="{ThemeResource AccentButtonStyle}"
+                        ToolTipService.ToolTip="Open the current site in file explorer or web browser."
                         HorizontalAlignment="Stretch"
                         Margin="4,0,4,0"
                         >
@@ -95,6 +102,7 @@
                         Padding="4"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
+                        ToolTipService.ToolTip="Resize the browser to fit the selected device size."
                         >
                         <FontIcon Glyph="&#xE8EA;"/>
                         <Button.Flyout>
@@ -111,15 +119,31 @@
                         Padding="4"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
+                        ToolTipService.ToolTip="See docs in dark or light mode."
                         Click="DarkModeButton_Click">
-                <FontIcon Glyph="{x:Bind DarkModeIcon, Mode=OneTime}"/>
+                <FontIcon Glyph="{x:Bind local:BrowserControl.DarkModeIcon, Mode=OneTime}"/>
             </Button>
             <Button
-                        x:Name="SettingsButton"
+                        x:Name="JsButton"
                         Grid.Column="9"
                         Padding="4"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
+                        ToolTipService.ToolTip="Enable or disable Javascript"                        
+                        Click="JsButton_Click">
+                <Grid>
+                    <FontIcon Glyph="&#xE99A;" />
+                    <FontIcon Glyph="&#xF78A;" Foreground="{x:Bind local:Settings.Instance.ViewModel.IsJsEnabled , Converter={StaticResource JSBackgroundConverter} , Mode=OneWay}" />
+                </Grid>
+            </Button>
+            
+            <Button
+                        x:Name="SettingsButton"
+                        Grid.Column="10"
+                        Padding="4"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        ToolTipService.ToolTip="Settings"
                         Click="SettingsButton_Click">
                 <FontIcon Glyph="&#xE713;" />
             </Button>

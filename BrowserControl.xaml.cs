@@ -1,10 +1,14 @@
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Windows.UI.ViewManagement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,7 +38,7 @@ namespace DocSpy
             else
             {
                 WebView.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Light;
-            }
+            }            
         }
 
         public void ReloadWebView()
@@ -242,13 +246,7 @@ namespace DocSpy
             //ThemeHelper.SetTheme(App.MainWindow);
         }
 
-        public string DarkModeIcon
-        {
-            get
-            {
-                return Application.Current.RequestedTheme == ApplicationTheme.Dark ? "\uE708" : "\uE706";
-            }
-        }
+        public static string DarkModeIcon => Application.Current.RequestedTheme == ApplicationTheme.Dark ? "\uE708" : "\uE706";
 
         private static void SetWindowSize(double width, double height)
         {
@@ -274,5 +272,35 @@ namespace DocSpy
             ((OverlappedPresenter)App.MainWindow.AppWindow.Presenter).Maximize();
         }
 
+        private void JsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.ViewModel.IsJsEnabled = !Settings.Instance.ViewModel.IsJsEnabled;
+            WebView.CoreWebView2.Settings.IsScriptEnabled = Settings.Instance.ViewModel.IsJsEnabled;
+        }
+    }
+
+
+    public class JSBackgroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is bool boolValue)
+            {
+                if (boolValue)
+                {
+                    return new SolidColorBrush(Colors.Transparent);
+                }
+                else
+                {
+                    return new SolidColorBrush(Colors.Red);
+                }
+            }
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException(); // Not usually needed for this scenario
+        }
     }
 }

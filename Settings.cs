@@ -72,7 +72,19 @@ namespace DocSpy
                 Set("BrowserUrl", value);
             }
         }
-       
+
+        public bool IsJsEnabled
+        {
+            get
+            {
+                return Get("IsJsEnabled", true);
+            }
+            set
+            {
+                Set("IsJsEnabled", value);
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public T Get<T>(string PropertyName, T DefaultValue)
@@ -101,6 +113,7 @@ namespace DocSpy
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasConfigFilePath)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ConfigFilePathExists)));
             }
+ 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
