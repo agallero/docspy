@@ -52,4 +52,5 @@ Once you have the settings done, and press `Ok` it should go to the following sc
 4. **Open button**: Will show a popup to open the html in a real browser, or open a file explorer where the html files are.
 5. **Size button**: Use it to resize the screen to a phone/tablet size.
 6. **Dark/Light mode button**: Will restart the app in Dark/Light mode so yo can see how the docs look in the different modes.
-7. **Settings button**: Will go to the settings page where you can edit the configuration file
+7. **JavaScript button**: Will show how the site looks when JavaScript is disabled.
+8. **Settings button**: Will go to the settings page where you can edit the configuration file
