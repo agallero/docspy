@@ -56,7 +56,7 @@
             <TextBlock x:Name="LogBox" 
             VerticalAlignment="Stretch"  
             HorizontalAlignment="Stretch" 
-            Padding="10"
+            Padding="12"
             IsTextSelectionEnabled="True" 
             TextWrapping="Wrap" />
         </ScrollView>

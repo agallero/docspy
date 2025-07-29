@@ -1,8 +1,5 @@
-﻿using DocSpy.Source;
-using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using System;
 
 
 

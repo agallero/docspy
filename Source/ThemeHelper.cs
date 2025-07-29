@@ -1,13 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-namespace DocSpy.Source
+﻿namespace DocSpy
 {
     /// <summary>
     /// Class providing functionality around switching and restoring theme settings

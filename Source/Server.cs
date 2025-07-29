@@ -1,18 +1,12 @@
-﻿using CommunityToolkit.WinUI.Controls;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace DocSpy.Source
+namespace DocSpy
 {
     internal class Server
     {
@@ -21,6 +15,7 @@ namespace DocSpy.Source
         
         public Action? UpdateUIServerStopped { get; set; }
         public Action? UpdateUIServerStarted { get; set; }
+        public Action<ILoggingBuilder>? AddLogging { get; set; }
         public bool Stopped { get; set; } = true;
 
         public static Server Instance { get; } = new Server();
@@ -41,7 +36,11 @@ namespace DocSpy.Source
         {
             await StopServe();
             var builder = WebApplication.CreateBuilder();
+
+            AddLogging?.Invoke(builder.Logging);
+
             host = builder.Build();
+            host.UseHttpLogging();
 
             host.MapGet("/ping", async context => await context.Response.WriteAsync("Hello World!"));
             host.MapGet("/not_found/index.html", async context => await context.Response.WriteAsync("Server not found!"));
@@ -69,7 +68,6 @@ namespace DocSpy.Source
             });
             Stopped = false;
             UpdateUIServerStarted?.Invoke();
-
         }
 
 
