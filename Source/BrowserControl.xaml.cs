@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -58,7 +59,12 @@ namespace DocSpy
 
         private async void OnReloadClicked(object sender, RoutedEventArgs e)
         {
-            WebView.Resources.Clear(); //clear resources to force reload.
+            await ReloadAndHardRefresh();
+        }
+
+        private async Task ReloadAndHardRefresh()
+        {
+            await WebView.CoreWebView2.Profile.ClearBrowsingDataAsync();
             await Server.Instance.Serve(); //forced. 
             WebView.Reload();
         }
@@ -136,8 +142,7 @@ namespace DocSpy
                 Progress.AppWindow.SetPresenter(presenter);
                 Progress.AppWindow.Show();
                 await Progress.Run();
-                await Server.Instance.Serve();
-                WebView.Reload();
+                await ReloadAndHardRefresh();
             }
             catch (Exception ex)
             {
