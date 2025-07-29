@@ -17,6 +17,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock TextWrapping="Wrap" Text="Log" Style="{ThemeResource TitleTextBlockStyle}" Padding="12" />
         <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Visible" ExtentChanged="ScrollView_ExtentChanged">
@@ -24,5 +25,6 @@
  HorizontalAlignment="Stretch" 
  Padding="12"/>
         </ScrollView>
+        <Button x:Name="ClearButton" Content="Clear" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10" Click="ClearButton_Click"/>
     </Grid>
 </Window>

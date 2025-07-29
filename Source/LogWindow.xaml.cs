@@ -9,7 +9,7 @@ namespace DocSpy
 {
     public sealed partial class LogWindow : Window
     {
-        DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        readonly DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         public LogWindow()
         {
@@ -36,6 +36,7 @@ namespace DocSpy
         {
             dispatcherQueue.TryEnqueue(() =>
             {
+                if (!this.Visible) return; // Only log if the window is visible
                 if (LogBox.Text.Length > 10000)
                 {
                     LogBox.Text = LogBox.Text.Substring(8000); // Clear the log if it exceeds a certain length
@@ -49,6 +50,10 @@ namespace DocSpy
             sender.ScrollTo(0, sender.ExtentHeight, new ScrollingScrollOptions(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
         }
 
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            LogBox.Text = string.Empty;
+        }
     }
 
 

@@ -31,7 +31,30 @@ namespace DocSpy
 
         private async void BrowserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            App.MainWindow.AppWindow.Changed += (s, args) =>
+            {
+                if (args.DidSizeChange)
+                {
+                    double scaleAdjustment = App.MainWindow.Content.XamlRoot.RasterizationScale;
+                    if (scaleAdjustment != 0)
+                    {
+                        Settings.Instance.ViewModel.WindowSize = new Windows.Foundation.Size(App.MainWindow.AppWindow.Size.Width / scaleAdjustment, App.MainWindow.AppWindow.Size.Height / scaleAdjustment);
+                    }
+                }
+
+                if (args.DidPositionChange)
+                {
+                    double scaleAdjustment = App.MainWindow.Content.XamlRoot.RasterizationScale;
+                    if (scaleAdjustment != 0)
+                    {
+                        Settings.Instance.ViewModel.WindowPosition = new Windows.Foundation.Point(App.MainWindow.AppWindow.Position.X / scaleAdjustment, App.MainWindow.AppWindow.Position.Y / scaleAdjustment);
+                    }
+                }
+            };
+            RestoreWindowSizeAndPosition();
             await WebView.EnsureCoreWebView2Async();
+            EnableDisableJavascript();
+
             if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
             {
                 WebView.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark;
@@ -254,7 +277,25 @@ namespace DocSpy
         public static string DarkModeIcon => Application.Current.RequestedTheme == ApplicationTheme.Dark ? "\uE708" : "\uE706";
 
 
-        private static void SetWindowSize(double width, double height)
+        private static void RestoreWindowSizeAndPosition()
+        {
+            double scaleAdjustment = App.MainWindow.Content.XamlRoot.RasterizationScale;
+            if (Settings.Instance.ViewModel.WindowSize.Width > 0 && Settings.Instance.ViewModel.WindowSize.Height > 0)
+            {
+                App.MainWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(
+                    (Int32)(Settings.Instance.ViewModel.WindowSize.Width * scaleAdjustment),
+                    (Int32)(Settings.Instance.ViewModel.WindowSize.Height * scaleAdjustment)));
+            }
+            if (Settings.Instance.ViewModel.WindowPosition.X > 0 && Settings.Instance.ViewModel.WindowPosition.Y > 0)
+            {
+                App.MainWindow.AppWindow.Move(new Windows.Graphics.PointInt32(
+                    (Int32)(Settings.Instance.ViewModel.WindowPosition.X * scaleAdjustment),
+                    (Int32)(Settings.Instance.ViewModel.WindowPosition.Y * scaleAdjustment)));
+            }
+
+        }
+
+        private static void SetWindowClientSize(double width, double height)
         {
             double scaleAdjustment = App.MainWindow.Content.XamlRoot.RasterizationScale;
             int buttonPanelWidth = (Int32)(Settings.Instance.ViewModel.ButtonPanelWidth.Value * scaleAdjustment);
@@ -264,13 +305,13 @@ namespace DocSpy
         private void PhoneButton_Click(object sender, RoutedEventArgs e)
         {
             // iPhone 16: https://www.ios-resolution.com
-            SetWindowSize(393, 852);
+            SetWindowClientSize(393, 852);
         }
 
         private void TabletButton_Click(object sender, RoutedEventArgs e)
         {
             // iPad Pro 13: https://www.ios-resolution.com
-            SetWindowSize(1032, 1376);
+            SetWindowClientSize(1032, 1376);
         }
 
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
@@ -281,6 +322,11 @@ namespace DocSpy
         private void JsButton_Click(object sender, RoutedEventArgs e)
         {
             Settings.Instance.ViewModel.IsJsEnabled = !Settings.Instance.ViewModel.IsJsEnabled;
+            EnableDisableJavascript();
+        }
+
+        private void EnableDisableJavascript()
+        {
             WebView.CoreWebView2.Settings.IsScriptEnabled = Settings.Instance.ViewModel.IsJsEnabled;
         }
 

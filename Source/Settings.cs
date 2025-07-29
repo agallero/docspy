@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 namespace DocSpy
@@ -82,6 +83,32 @@ namespace DocSpy
             set
             {
                 Set("IsJsEnabled", value);
+            }
+        }
+
+        public Size WindowSize
+        {
+            get
+            {
+                var size = Get("WindowSize", new Size(0, 0));
+                return size;
+            }
+            set
+            {
+                Set("WindowSize", value);
+            }
+        }
+
+        public Point WindowPosition
+        {
+            get
+            {
+                var position = Get("WindowPosition", new Point(-1, -1));
+                return position;
+            }
+            set
+            {
+                Set("WindowPosition", value);
             }
         }
 
