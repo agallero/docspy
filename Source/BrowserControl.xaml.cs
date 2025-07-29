@@ -17,6 +17,8 @@ namespace DocSpy
     {
         public Action<TRoot>? UpdateUINavigated { get; set; }
         public Action? UpdateUIGoToSettings {get;set; }
+        public LogWindow? Logger { get; internal set; }
+
         private bool UpdatingUrl { get; set; }
 
         public BrowserControl()
@@ -246,6 +248,7 @@ namespace DocSpy
 
         public static string DarkModeIcon => Application.Current.RequestedTheme == ApplicationTheme.Dark ? "\uE708" : "\uE706";
 
+
         private static void SetWindowSize(double width, double height)
         {
             double scaleAdjustment = App.MainWindow.Content.XamlRoot.RasterizationScale;
@@ -274,6 +277,12 @@ namespace DocSpy
         {
             Settings.Instance.ViewModel.IsJsEnabled = !Settings.Instance.ViewModel.IsJsEnabled;
             WebView.CoreWebView2.Settings.IsScriptEnabled = Settings.Instance.ViewModel.IsJsEnabled;
+        }
+
+        private void LogButton_Click(object sender, RoutedEventArgs e)
+        {
+            Logger?.AppWindow.Hide();
+            Logger?.AppWindow.Show();
         }
     }
 

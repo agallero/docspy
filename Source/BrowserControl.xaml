@@ -28,6 +28,7 @@
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
             <Button
                         x:Name="BackButton"
@@ -136,10 +137,20 @@
                     <FontIcon Glyph="&#xF78A;" Foreground="{x:Bind local:Settings.Instance.ViewModel.IsJsEnabled , Converter={StaticResource JSBackgroundConverter} , Mode=OneWay}" />
                 </Grid>
             </Button>
-            
+            <Button
+                        x:Name="LogButton"
+                        Grid.Column="10"
+                        Padding="4"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        ToolTipService.ToolTip="Show server logs."
+                        Click="LogButton_Click">
+                <FontIcon Glyph="&#xe9a4;"/>
+            </Button>
+
             <Button
                         x:Name="SettingsButton"
-                        Grid.Column="10"
+                        Grid.Column="11"
                         Padding="4"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"

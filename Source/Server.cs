@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using System;
@@ -36,11 +37,12 @@ namespace DocSpy
         {
             await StopServe();
             var builder = WebApplication.CreateBuilder();
-
+            builder.Services.AddHttpLogging(o => { });
             AddLogging?.Invoke(builder.Logging);
 
             host = builder.Build();
             host.UseHttpLogging();
+
 
             host.MapGet("/ping", async context => await context.Response.WriteAsync("Hello World!"));
             host.MapGet("/not_found/index.html", async context => await context.Response.WriteAsync("Server not found!"));
@@ -62,10 +64,18 @@ namespace DocSpy
                 }
             }
 
-            var serverTask = Task.Run(() =>
+            try
             {
-                host.RunAsync(RootUrl);
-            });
+                var serverTask = Task.Run(() =>
+                {
+                    host.RunAsync(RootUrl);
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error starting server: {ex.Message}");
+                return;
+            }
             Stopped = false;
             UpdateUIServerStarted?.Invoke();
         }

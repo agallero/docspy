@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Windowing;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 
 
@@ -10,6 +11,7 @@ namespace DocSpy
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        public LogWindow LogWindow { get; } = new LogWindow();
         public MainWindow()
         {
             InitializeComponent();
@@ -18,8 +20,16 @@ namespace DocSpy
             ServerCtrl.UpdateUINavigated = BrowserCtrl.UpdateWebView;
             Server.Instance.UpdateUIServerStarted = ServerCtrl.ActivatePanel;
             Server.Instance.UpdateUIServerStopped = ServerCtrl.DeactivatePanel;
+            Server.Instance.AddLogging = (loggingBuilder) =>
+            {
+                loggingBuilder.AddProvider(new UiLoggerProvider(message =>
+                {
+                    LogWindow.Log(message);
+                }));
+            };
             BrowserCtrl.UpdateUINavigated = ServerCtrl.ActivateRoot;
             BrowserCtrl.UpdateUIGoToSettings = SelectSettings;
+            BrowserCtrl.Logger = LogWindow;
             SettingsPage.UpdateUIGoToBrowser = ()=>
             {
                 ServerCtrl.RecreatePanel();
@@ -36,6 +46,11 @@ namespace DocSpy
             {
                 SelectSettings();
             }
+
+            Closed += (s, e) =>
+            {
+                LogWindow.Close();
+            };
         }
 
         private void SelectSettings()
