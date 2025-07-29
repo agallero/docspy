@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 
 namespace DocSpy
 {
@@ -109,6 +110,18 @@ namespace DocSpy
             set
             {
                 Set("WindowPosition", value);
+            }
+        }
+
+        public ApplicationDataCompositeValue BrowserHistory
+        {
+            get
+            {
+                return Get("BrowserHistory", new ApplicationDataCompositeValue());
+            }
+            set
+            {
+                Set("BrowserHistory", value);
             }
         }
 

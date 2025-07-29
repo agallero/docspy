@@ -160,13 +160,14 @@
             </Button>
 
 
-            <TextBox 
+            <AutoSuggestBox 
                         x:Name="UrlEntry"
                         Grid.Column="3"
-
+                        GotFocus="UrlEntry_GotFocus"
+                        LostFocus="UrlEntry_LostFocus"
                         Margin="4,0,4,0"
                         TextChanged="UrlEntry_TextChanged">
-            </TextBox>
+            </AutoSuggestBox>
         </Grid>
         <WebView2
                  Grid.Row="1"

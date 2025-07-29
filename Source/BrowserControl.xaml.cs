@@ -6,8 +6,13 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,6 +26,7 @@ namespace DocSpy
         public LogWindow? Logger { get; internal set; }
 
         private bool UpdatingUrl { get; set; }
+        const int MaxHistory = 64;
 
         public BrowserControl()
         {
@@ -100,10 +106,37 @@ namespace DocSpy
         private void WebView_Navigated(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             Settings.Instance.ViewModel.BrowserUrl = WebView.Source.ToString();
+            if(e.IsSuccess) UpdateBrowserHistory();
             UriHelper.MatchUrl(WebView.Source.ToString(), (root) =>
             {
                 UpdateUINavigated?.Invoke(root);
             });
+        }
+
+        private void UpdateBrowserHistory()
+        {
+            try
+            {
+                var History = Settings.Instance.ViewModel.BrowserHistory;
+                if (History == null)
+                {
+                    History = [];
+                }
+                var currentObj = History["current"];
+                var current = currentObj == null ? 0 : (int)(currentObj);
+                if (History[current.ToString(CultureInfo.InvariantCulture)].ToString() == WebView.Source.ToString())
+                {
+                    return; // No need to update if the current URL is already in history.
+                }
+                var next = (current + 1) % MaxHistory;
+                History[next.ToString(CultureInfo.InvariantCulture)] = WebView.Source.ToString();
+                History["current"] = next;
+                Settings.Instance.ViewModel.BrowserHistory = History;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error updating browser history: {ex.Message}");
+            }
         }
 
         private async void WebView_Navigating(object sender, CoreWebView2NavigationStartingEventArgs e)
@@ -117,22 +150,6 @@ namespace DocSpy
             finally
             {
                 UpdatingUrl = false;
-            }
-        }
-
-        private void UrlEntry_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (UpdatingUrl)
-            {
-                return; // Don't reload while updating the URL.
-            }
-
-            try
-            {
-                WebView.Source = new Uri(UrlEntry.Text);
-            }
-            catch (UriFormatException)
-            {
             }
         }
 
@@ -334,6 +351,75 @@ namespace DocSpy
         {
             Logger?.AppWindow.Hide();
             Logger?.AppWindow.Show();
+        }
+
+        private static void FillList(AutoSuggestBox sender, IEnumerable<string> items)
+        {
+
+            sender.ItemsSource = items;
+            return;
+        }
+
+        private void UrlEntry_GotFocus(object sender, RoutedEventArgs e)
+        {
+            AutoSuggestBox Box = (AutoSuggestBox)sender;
+            FillList(Box, GetUrlHistory());
+            Box.IsSuggestionListOpen = true;
+        }
+
+        private IEnumerable<string> GetUrlHistory()
+        {
+            var History = Settings.Instance.ViewModel.BrowserHistory;
+            if (History == null || History.Count == 0)
+            {
+                yield break;
+            }
+            var currentObj = History["current"];
+            var current = currentObj == null ? 0 : (int)(currentObj);
+            var entries = new int[History.Count - 1];
+            int k = 0;
+            for (int i = current - 1; i >= 0; i--)
+            {
+                entries[k] = i;
+                k++;
+            }
+            for (int i = History.Count - 1; i > current; i--)
+            {
+                entries[k] = i;
+                k++;
+            }
+            foreach (var i in entries)
+            {
+                if (History.TryGetValue(i.ToString(CultureInfo.InvariantCulture), out var url))
+                {
+                    string? urlStr = url.ToString();
+                    if (urlStr != null)
+                    {
+                        yield return urlStr;
+                    }
+                }
+            }
+        }
+
+        private void UrlEntry_LostFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UrlEntry_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (UpdatingUrl)
+            {
+                return; // Don't reload while updating the URL.
+            }
+
+            try
+            {
+                WebView.Source = new Uri(UrlEntry.Text);
+            }
+            catch (UriFormatException)
+            {
+            }
         }
     }
 
