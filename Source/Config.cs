@@ -63,7 +63,11 @@ namespace DocSpy
                 {
                     name = Guid.NewGuid().ToString();
                 }
-                Roots = [.. Roots, new TRoot(folder, name, Command, CommandArguments, Editor, EditorArguments)];
+
+                var UploadCommand = ReplaceVariables(section["upload"], Variables);
+                var UploadCommandArguments = ReplaceVariables(section["upload-arguments"], Variables);
+
+                Roots = [.. Roots, new TRoot(folder, name, Command, CommandArguments, Editor, EditorArguments, UploadCommand, UploadCommandArguments)];
             }
 
             return Roots?.Length > 0;

@@ -17,23 +17,30 @@ using WinRT.Interop;
 
 namespace DocSpy
 {
-    public sealed partial class Building : Window
+    public sealed partial class ProgressForm : Window
     {
         public TRoot Root { get; }
+        public string Verb { get; }
+        public string? Command { get; }
+        public string? CommandArguments { get; }
+        public string PastVerb { get; }
         public bool Working { get; set; } = false;
         readonly Stopwatch Watch = new();
 
 
-        public Building(TRoot root)
+        public ProgressForm(TRoot root, string aVerb, string aPastVerb, string? aCommand, string? aCommandArguments)
         {
             InitializeComponent();
-
-            Closed += Building_Closed;
+            Verb = aVerb;
+            PastVerb = aPastVerb;
+            Command = aCommand;
+            CommandArguments = aCommandArguments;
+            Closed += Progress_Closed;
             AppWindow.Closing += AppWindow_Closing;
             Root = root;
             
-            this.Title = "D👁️CSpy Build";
-            CaptionLabel.Text = $"Building {Root.Name}...";
+            this.Title = $"D👁️CSpy {Verb}";
+            CaptionLabel.Text = $"{Verb}ing {Root.Name}...";
 
             AppWindow.Resize(new Windows.Graphics.SizeInt32(1600, 800));
             AppWindow.SetIcon("Assets/DocSpy.ico");
@@ -86,7 +93,7 @@ namespace DocSpy
 
         #endregion
 
-        private void Building_Closed(object sender, WindowEventArgs args)
+        private void Progress_Closed(object sender, WindowEventArgs args)
         {
             if (!Working) BadgeNotificationManager.Current.ClearBadge();
             App.MainWindow.Activate();
@@ -120,10 +127,10 @@ namespace DocSpy
             };
             Grid.SetRow(CloseButton, 3);
 
-            if (string.IsNullOrEmpty(Root.BuildCommand))
+            if (string.IsNullOrEmpty(Command))
             {
-                CaptionLabel.Text = "No build command specified.";
-                LogBox.Text += $"The configuration file doesn't specify a command to build {Root.Name}";
+                CaptionLabel.Text = $"No {Verb} command specified.";
+                LogBox.Text += $"The configuration file doesn't specify a command to {Verb} {Root.Name}";
             }
             else
             {
@@ -145,7 +152,7 @@ namespace DocSpy
                         };
                         Timer.Start();
                         Watch.Start();
-                        ExitCode = await RunProcessAsync(Root.BuildCommand, Root.BuildCommandArguments ?? "", DispatcherQueue.GetForCurrentThread(), LogBox);
+                        ExitCode = await RunProcessAsync(Command, CommandArguments ?? "", DispatcherQueue.GetForCurrentThread(), LogBox);
                         Watch.Stop();
                         Timer.Stop();
                     }
@@ -164,7 +171,7 @@ namespace DocSpy
                 {
                     this.Close();
                     AppNotification notification = new AppNotificationBuilder()
-                        .AddText($"Documentation for {Root.Name} built successfully!")
+                        .AddText($"Documentation for {Root.Name} {PastVerb} successfully!")
                         .AddText($"Time: {Watch.Elapsed.ToString("%m' min, '%s' sec'")}")
                         .BuildNotification();
 
@@ -182,10 +189,10 @@ namespace DocSpy
             if (AppWindow != null && AppWindow.IsVisible) BadgeNotificationManager.Current.SetBadgeAsGlyph(BadgeNotificationGlyph.Error);
             else BadgeNotificationManager.Current.ClearBadge(); //If the window was already closed, there is no way to clear the badge later.
 
-            CaptionLabel.Text = $"ERROR Building {Root.Name}...";
+            CaptionLabel.Text = $"ERROR {Verb}ing {Root.Name}...";
             CaptionLabel.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Red);
             AppNotification errNotification = new AppNotificationBuilder()
-                 .AddText($"😿 Error building documentation for {Root.Name}.")
+                 .AddText($"😿 Error {Verb}ing documentation for {Root.Name}.")
                  .BuildNotification();
 
             AppNotificationManager.Default.Show(errNotification);

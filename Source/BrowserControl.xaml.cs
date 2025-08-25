@@ -155,7 +155,7 @@ namespace DocSpy
 
         private async void RebuildButton_Clicked(object sender, RoutedEventArgs e)
         {
-            Building? Progress = null;
+            ProgressForm? Progress = null;
             try
             {
                 var Root = null as TRoot;
@@ -174,7 +174,7 @@ namespace DocSpy
                 }
 
                 await Server.Instance.StopServe();
-                Progress = new Building(Root);
+                Progress = new ProgressForm(Root, "build", "built", Root.BuildCommand, Root.BuildCommandArguments);
                 var presenter = OverlappedPresenter.CreateForDialog();
                 presenter.IsResizable = true;
                 presenter.IsModal = true;
@@ -237,6 +237,7 @@ namespace DocSpy
             }
             Process.Start(Root.Editor, arguments);
         }
+
 
         private async void OpenInExplorerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -421,6 +422,68 @@ namespace DocSpy
             {
             }
         }
+
+        private async void UploadButton_Clicked(object sender, RoutedEventArgs e)
+        {
+            ContentDialog mainWarning = new()
+            {
+                Title = "Warning",
+                Content = $"Do you want to upload the docs?",
+                PrimaryButtonText = "Upload",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.Content.XamlRoot
+            };
+            var result = await mainWarning.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
+            ProgressForm? Progress = null;
+            try
+            {
+                var Root = null as TRoot;
+                UriHelper.MatchUrl(WebView.Source.ToString(), (root) => { Root = root; });
+                if (Root == null)
+                {
+                    ContentDialog dialog = new()
+                    {
+                        Title = "Upload",
+                        Content = $"Can't find the site at {WebView.Source}",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+                    await dialog.ShowAsync();
+                    return;
+                }
+
+                await Server.Instance.StopServe();
+                Progress = new ProgressForm(Root, "upload", "uploaded", Root.UploadCommand, Root.UploadCommandArguments);
+                var presenter = OverlappedPresenter.CreateForDialog();
+                presenter.IsResizable = true;
+                presenter.IsModal = true;
+
+                Progress.AppWindow.SetPresenter(presenter);
+                Progress.AppWindow.Show();
+                await Progress.Run();
+            }
+            catch (Exception ex)
+            {
+                Progress?.Close();
+
+                ContentDialog errorDialog = new()
+                {
+                    Title = "Error",
+                    Content = $"An error occurred while uploading: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+
+        }
+
     }
 
 
